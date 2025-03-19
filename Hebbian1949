@@ -1,0 +1,58 @@
+# single neuron hebbian learning
+import numpy as np 
+import matplotlib.pyplot as plt
+
+class HebbianNeuron:
+    def __init__(self, num_inputs, learning_rate=0.1):
+        self.threshold=0.05
+        self.weights = np.random.rand(num_inputs) * 0.2
+        self.learning_rate = learning_rate
+
+    def activate(self, inputs):
+        weighted_sum = np.dot(inputs, self.weights)
+
+        output = 1 if weighted_sum > self.threshold else 0
+
+        if output == 1:
+            self.weights += self.learning_rate * inputs * (1 - self.weights)
+        return output, self.weights.copy()
+
+neuron = HebbianNeuron(2)
+inputs = np.array([[0,0],[0,1],[1,0],[1,1]])
+results = []
+
+for _ in range(50):
+    epoch_results = []
+    for inp in inputs:
+        output, weights=neuron.activate(inp)
+        epoch_results.append((inp, output, weights))
+    results.append(epoch_results)
+
+# print("Initial:")
+# for inp, output, weights in results[0]:
+#     print(f'Input: {inp}, Output: {output}, Weights: {weights}')
+# print("Final:")
+# for inp, output, weights in results[-1]:
+#     print(f'Input: {inp}, Output: {output}, Weights: {weights}')
+
+
+# conclusion: if an input activates a neuron, the connection from that input will grow stronger with time.
+# disclaimer: nature is more probabilistic, but this conclusion satisfies the deterministic characteristic of this code.
+#___________________________________________________
+# bidirectional hebbian learning:
+
+class BCMNeuron:
+    def __init__(self, num_inputs, learning_rate=0.1):
+        self.weights = np.random.randn(num_inputs) * 0.2
+        self.learning_rate = learning_rate
+        self.theta = 0.1
+        self.theta_rate = 0.02
+
+    def activate(self, inputs):
+        weighted_sum = np.dot(inputs, self.weights)
+        output = weighted_sum
+
+        phi = output * (output - self.theta)
+        self.weights = self.weights + self.learning_rate * inputs * phi 
+
+# bored so quit
