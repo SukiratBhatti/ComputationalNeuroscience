@@ -1,0 +1,86 @@
+# all or none McCulloch-Pitts model:
+
+class basicNeuron:
+    def __init__(self, threshold=1):
+        self.threshold = threshold
+
+    def activate(self, inputs):
+        total_inputs = sum(inputs)
+        
+        if total_inputs >= self.threshold:
+            return 1
+        else:
+            return 0
+        
+neuron = basicNeuron(threshold=2)
+
+print(f'Input: [1, 1, 0], Output: {neuron.activate([1,1,0])}')
+print(f'Input: [1, 0, 0], Output: {neuron.activate([1,0,0])}')
+print(f'Input: [1, 1, 1], Output: {neuron.activate([1,1,1])}')
+
+# Conclusion: The brain is not a mysterious black box.
+# It can be modelled as a simple mathematical function.
+#______________________________________________________________________
+# inhibitory synapse added:
+
+class InhibitoryNeuron:
+    def __init__(self, threshold=1):
+        self.threshold=threshold
+    def activate(self, excite_inputs, inhibit_inputs):
+        if any(inhibit_inputs):
+            return 0
+        
+        total_excite = sum(excite_inputs)
+
+        return 1 if total_excite >= self.threshold else 0
+        
+basic = basicNeuron(threshold=2)
+inhibit = InhibitoryNeuron(threshold=2)
+
+print('Basic Neuron:', basic.activate([0,1,1]))
+print('Without inhibition:', inhibit.activate([0, 1, 1], [0]))
+print('With inhibition:', inhibit.activate([0, 1, 1], [1]))
+
+# Conclusion: the brain is capable of both activation and inhibition responses. 
+# The counterintuitive idea is that the latter is also an ACTIVE process. 
+#______________________________________________________________________
+# temporal integration:
+
+class TemporalNeuron:
+    def __init__(self, threshold=1):
+        self.threshold=threshold
+        self.time_buffer = []
+
+    def activate(self, current_inputs, delay=1):
+        self.time_buffer.append(current_inputs)
+
+        if len(self.time_buffer) > delay + 1:
+            self.time_buffer.pop(0)
+
+        if len(self.time_buffer) <= delay:
+            return 0
+        
+        delayed_inputs = self.time_buffer[-(delay+1)]
+        total = sum(delayed_inputs)
+
+        return 1 if total >= self.threshold else 0
+
+instant = basicNeuron(threshold=2)
+temporal = TemporalNeuron(threshold=2)
+
+print("instant: ", instant.activate([0, 1, 1]))
+print("temporal: ", temporal.activate([0, 1,1]))
+print("\nAfter time: \n")
+
+print("instant: ", instant.activate([0,0,1]))
+print("temporal: ", temporal.activate([0,0,1]))
+
+# Conclusion:
+# The brain is capable of storing inputs to act on them later (self.time_buffer.append(current_inputs))
+# Activation is always based on past inputs [-(delay+1)]
+# Activation test occurs not just by instantenous activations, but inputs over time. (delay =< length of current_inputs < delay + 1)
+# Activation still has to be higher than threshold to occur.
+#______________________________________________________________________
+# Logical circuits:
+
+#skipped--too boring
